@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HUMofA — Production Desktop Workspace</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <!-- Top Header Bar -->
+    <header class="app-header" id="app-header">
+        <div class="header-left">
+            <div class="app-brand">
+                <span class="status-pulse-dot" id="header-pulse-dot" title="Core Engine Active"></span>
+                <span class="brand-title">HUMofA</span>
+                <span class="brand-badge">Desktop Workspace</span>
+            </div>
+            <div class="session-picker-wrapper">
+                <label for="header-session-select" class="sr-only">Active Session</label>
+                <select id="header-session-select" class="session-dropdown" title="Active Session">
+                    <option value="">Default Session</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <button id="btn-palette-trigger" class="command-palette-trigger" title="Open Global Command Palette (Ctrl+K)">
+                <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span class="palette-prompt-text">Search commands, sessions, files...</span>
+                <kbd class="kbd-badge">Ctrl+K</kbd>
+            </button>
+        </div>
+
+        <div class="header-right">
+            <button id="btn-setup-wizard" class="btn-secondary" title="Open LLM &amp; Workspace Setup Wizard">
+                <span>⚙ Setup / LLM</span>
+            </button>
+
+            <div class="ws-status-badge" id="ws-status-badge" title="WebSocket Live Stream Status">
+                <span class="status-dot disconnected" id="ws-status-dot"></span>
+                <span class="status-text" id="ws-status-text">Connecting...</span>
+            </div>
+
+            <button id="btn-theme-toggle" class="btn-icon" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
+                <svg id="theme-icon-sun" class="icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg id="theme-icon-moon" class="icon hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+
+            <button id="btn-panic-stop" class="btn-panic" title="Panic Kill-Switch (Emergency Cut-Off)">
+                <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>PANIC STOP</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Split-Layout Container -->
+    <div class="app-body" id="app-body">
+        <!-- Collapsible & Customizable Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Icon Rail (Navigation Icons) -->
+            <nav class="sidebar-rail" id="sidebar-rail">
+                <button class="rail-btn active" data-view="tasks" title="Tasks &amp; Launcher">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span class="rail-label">Tasks</span>
+                </button>
+                <button class="rail-btn" data-view="sessions" title="Agent Sessions">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <span class="rail-label">Sessions</span>
+                </button>
+                <button class="rail-btn" data-view="history" title="Conversation History">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="rail-label">History</span>
+                </button>
+                <button class="rail-btn" data-view="workspaces" title="Workspaces &amp; Projects">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="rail-label">Workspaces</span>
+                </button>
+                <button class="rail-btn" data-view="files" title="Files Explorer">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                        <polyline points="13 2 13 9 20 9"></polyline>
+                    </svg>
+                    <span class="rail-label">Files</span>
+                </button>
+                <button class="rail-btn" data-view="skills" title="Skills Hub">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span class="rail-label">Skills</span>
+                </button>
+                <button class="rail-btn" data-view="subagents" title="Subagents Kanban">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="18" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="10" rx="1"></rect>
+                        <rect x="14" y="17" width="7" height="4" rx="1"></rect>
+                    </svg>
+                    <span class="rail-label">Subagents</span>
+                </button>
+                <button class="rail-btn" data-view="cron" title="Scheduled Tasks">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="rail-label">Cron</span>
+                </button>
+                <button class="rail-btn" data-view="memory" title="Persistent Memory">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    <span class="rail-label">Memory</span>
+                </button>
+                <button class="rail-btn" data-view="integrations" title="Gateway Integrations">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <span class="rail-label">Integrations</span>
+                </button>
+                <button class="rail-btn" data-view="settings" title="Settings">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span class="rail-label">Settings</span>
+                </button>
+            </nav>
+
+            <!-- Sidebar Views Content Area -->
+            <div class="sidebar-views" id="sidebar-views">
+                <!-- 1. Tasks View -->
+                <div class="view-panel active" id="view-tasks">
+                    <div class="view-header">
+                        <h3>Autonomous Tasks</h3>
+                        <span class="badge" id="tasks-count-badge">0 Active</span>
+                    </div>
+
+                    <!-- New Task Launcher -->
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Launch Autonomous Task</h4>
+                        </div>
+                        <form id="form-new-task" class="form-stack">
+                            <label for="task-prompt-input" class="form-label">Task Prompt</label>
+                            <textarea id="task-prompt-input" class="form-textarea" rows="3" placeholder="Describe the goal for the autonomous agent..." required></textarea>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="task-model-select" class="form-label">Model</label>
+                                    <select id="task-model-select" class="form-select">
+                                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                                        <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
+                                        <option value="gpt-4o">GPT-4o</option>
+                                        <option value="ollama/llama3">Ollama Local</option>
+                                    </select>
+                                </div>
+                                <div class="form-col">
+                                    <label for="task-autonomy-select" class="form-label">Autonomy</label>
+                                    <select id="task-autonomy-select" class="form-select">
+                                        <option value="Guarded">Guarded</option>
+                                        <option value="FullAutonomy">Full Autonomy</option>
+                                        <option value="Conservative">Conservative</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btn-dispatch-task" class="btn-primary btn-block">
+                                <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                                <span>Launch Task</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Active Tasks List -->
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Active Tasks</h4>
+                        </div>
+                        <div id="active-tasks-list" class="task-items-list">
+                            <div class="empty-placeholder">No active tasks running</div>
+                        </div>
+                    </div>
+
+                    <!-- Task History -->
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Task History</h4>
+                        </div>
+                        <div id="task-history-list" class="task-items-list">
+                            <div class="empty-placeholder">No completed tasks yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Sessions View -->
+                <div class="view-panel" id="view-sessions">
+                    <div class="view-header">
+                        <h3>Agent Sessions</h3>
+                        <button id="btn-open-new-session" class="btn-xs btn-primary">+ New</button>
+                    </div>
+
+                    <!-- Create Session Card -->
+                    <div class="sidebar-card" id="card-new-session">
+                        <div class="card-header">
+                            <h4>Create Session</h4>
+                        </div>
+                        <form id="form-new-session" class="form-stack">
+                            <label for="session-title-input" class="form-label">Session Title</label>
+                            <input id="session-title-input" class="form-input" type="text" placeholder="e.g. Solution Refactor" />
+
+                            <label for="session-model-select" class="form-label">Model</label>
+                            <select id="session-model-select" class="form-select">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                                <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
+                                <option value="gpt-4o">GPT-4o</option>
+                            </select>
+
+                            <button type="submit" class="btn-secondary btn-block">Create Session</button>
+                        </form>
+                    </div>
+
+                    <!-- Sessions List -->
+                    <div id="sessions-list" class="list-stack">
+                        <div class="empty-placeholder">Loading sessions...</div>
+                    </div>
+                </div>
+
+                <!-- 3. History View -->
+                <div class="view-panel" id="view-history">
+                    <div class="view-header">
+                        <h3>Conversation History</h3>
+                    </div>
+                    <div class="search-box">
+                        <input id="history-search-input" class="form-input" type="text" placeholder="Search transcript..." />
+                    </div>
+                    <div id="history-list" class="list-stack">
+                        <div class="empty-placeholder">Select a session to view transcript history</div>
+                    </div>
+                </div>
+
+                <!-- 4. Workspaces View -->
+                <div class="view-panel" id="view-workspaces">
+                    <div class="view-header">
+                        <h3>Workspaces &amp; Projects</h3>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Current Workspace</h4>
+                        </div>
+                        <div class="workspace-meta">
+                            <div class="meta-label">Path:</div>
+                            <div id="workspace-current-path" class="code-badge">Loading...</div>
+                            <div class="meta-label">Status:</div>
+                            <div id="workspace-current-status" class="pill pill-green">Online</div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Switch Workspace</h4>
+                        </div>
+                        <form id="form-switch-workspace" class="form-stack">
+                            <input id="workspace-path-input" class="form-input" type="text" placeholder="Full directory path..." />
+                            <button type="submit" class="btn-secondary btn-block">Open Path</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 5. Files View -->
+                <div class="view-panel" id="view-files">
+                    <div class="view-header">
+                        <h3>File Explorer</h3>
+                        <div class="header-actions">
+                            <button id="btn-fs-refresh" class="btn-icon-sm" title="Refresh Tree">
+                                <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="fs-tree-container" class="fs-tree">
+                        <div class="empty-placeholder">Loading file tree...</div>
+                    </div>
+                </div>
+
+                <!-- 6. Skills View -->
+                <div class="view-panel" id="view-skills">
+                    <div class="view-header">
+                        <h3>Skills Hub</h3>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Install Skill (AST Scan)</h4>
+                        </div>
+                        <form id="form-install-skill" class="form-stack">
+                            <input id="skill-repo-input" class="form-input" type="text" placeholder="repo or URL (e.g. openai/skills)" required />
+                            <button type="submit" class="btn-primary btn-block">Scan &amp; Install</button>
+                        </form>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Installed Skills</h4>
+                        </div>
+                        <div id="installed-skills-list" class="list-stack">
+                            <div class="empty-placeholder">Loading skills...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Subagents View -->
+                <div class="view-panel" id="view-subagents">
+                    <div class="view-header">
+                        <h3>Subagents &amp; Kanban</h3>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>New Kanban Task</h4>
+                        </div>
+                        <form id="form-new-kanban" class="form-stack">
+                            <input id="kanban-title-input" class="form-input" type="text" placeholder="Task title..." required />
+                            <input id="kanban-desc-input" class="form-input" type="text" placeholder="Description (optional)" />
+                            <button type="submit" class="btn-secondary btn-block">Add Card</button>
+                        </form>
+                    </div>
+                    <div class="kanban-container" id="kanban-board">
+                        <div class="kanban-col" data-col="Pending">
+                            <div class="col-header">Pending</div>
+                            <div class="col-cards" id="kanban-col-pending"></div>
+                        </div>
+                        <div class="kanban-col" data-col="InProgress">
+                            <div class="col-header">In Progress</div>
+                            <div class="col-cards" id="kanban-col-inprogress"></div>
+                        </div>
+                        <div class="kanban-col" data-col="Blocked">
+                            <div class="col-header">Blocked</div>
+                            <div class="col-cards" id="kanban-col-blocked"></div>
+                        </div>
+                        <div class="kanban-col" data-col="Done">
+                            <div class="col-header">Done</div>
+                            <div class="col-cards" id="kanban-col-done"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Cron View -->
+                <div class="view-panel" id="view-cron">
+                    <div class="view-header">
+                        <h3>Scheduled Tasks (Natural Cron)</h3>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Schedule Job</h4>
+                        </div>
+                        <form id="form-new-cron" class="form-stack">
+                            <input id="cron-name-input" class="form-input" type="text" placeholder="Job Name..." required />
+                            <input id="cron-phrase-input" class="form-input" type="text" placeholder="Schedule (e.g. daily at 09:00, every 10 minutes)..." required />
+                            <textarea id="cron-prompt-input" class="form-textarea" rows="2" placeholder="Autonomous prompt instruction..." required></textarea>
+                            <button type="submit" class="btn-primary btn-block">Schedule Task</button>
+                        </form>
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Active Cron Jobs</h4>
+                        </div>
+                        <div id="cron-jobs-list" class="list-stack">
+                            <div class="empty-placeholder">No scheduled jobs registered</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Memory View -->
+                <div class="view-panel" id="view-memory">
+                    <div class="view-header">
+                        <h3>Persistent Memory</h3>
+                    </div>
+                    <div class="memory-tab-bar">
+                        <button class="mem-tab-btn active" data-kind="Memory">MEMORY.md</button>
+                        <button class="mem-tab-btn" data-kind="Soul">SOUL.md</button>
+                        <button class="mem-tab-btn" data-kind="User">USER.md</button>
+                    </div>
+                    <div class="search-box">
+                        <input id="memory-search-input" class="form-input" type="text" placeholder="FTS5 BM25 search..." />
+                    </div>
+                    <div id="memory-search-results" class="list-stack hidden"></div>
+
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4 id="memory-current-title">MEMORY.md</h4>
+                        </div>
+                        <form id="form-memory-append" class="form-stack">
+                            <input id="memory-entry-title" class="form-input" type="text" placeholder="Entry section title..." required />
+                            <textarea id="memory-entry-content" class="form-textarea" rows="3" placeholder="Content to append..." required></textarea>
+                            <button type="submit" class="btn-secondary btn-block">Append Memory</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 10. Integrations View -->
+                <div class="view-panel" id="view-integrations">
+                    <div class="view-header">
+                        <h3>Omnichannel Gateway</h3>
+                    </div>
+                    <div id="integrations-list" class="list-stack">
+                        <div class="empty-placeholder">Loading channel adapters...</div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h4>Channel Test Ping</h4>
+                        </div>
+                        <form id="form-test-integration" class="form-stack">
+                            <label for="integration-channel-select" class="form-label">Channel</label>
+                            <select id="integration-channel-select" class="form-select">
+                                <option value="telegram">Telegram</option>
+                                <option value="discord">Discord</option>
+                                <option value="slack">Slack</option>
+                                <option value="whatsapp">WhatsApp</option>
+                                <option value="signal">Signal</option>
+                                <option value="email">Email</option>
+                                <option value="cli">CLI</option>
+                            </select>
+                            <input id="integration-test-msg" class="form-input" type="text" placeholder="Test message payload..." value="Ping test from UI" />
+                            <button type="submit" class="btn-secondary btn-block">Send Test Message</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 11. Settings View -->
+                <div class="view-panel" id="view-settings">
+                    <div class="view-header">
+                        <h3>Settings &amp; Configuration</h3>
+                        <button type="button" id="btn-open-setup-from-settings" class="btn-secondary">Setup Wizard</button>
+                    </div>
+                    <form id="form-settings" class="form-stack">
+                        <div class="sidebar-card">
+                            <div class="card-header">
+                                <h4>Model Routing</h4>
+                            </div>
+                            <label for="settings-default-model" class="form-label">Default Model</label>
+                            <select id="settings-default-model" class="form-select">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                                <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
+                                <option value="gpt-4o">GPT-4o</option>
+                                <option value="openrouter/auto">OpenRouter Auto</option>
+                                <option value="nous/hermes-3-llama-3.1-405b">Nous Hermes 3 405B</option>
+                                <option value="ollama/llama3">Ollama Local</option>
+                            </select>
+
+                            <label for="settings-fallback-model" class="form-label">Fallback Model</label>
+                            <input id="settings-fallback-model" class="form-input" type="text" value="offline-mock" />
+                        </div>
+
+                        <div class="sidebar-card">
+                            <div class="card-header">
+                                <h4>API Keys (Masked)</h4>
+                            </div>
+                            <label for="settings-key-gemini" class="form-label">Gemini API Key</label>
+                            <input id="settings-key-gemini" class="form-input" type="password" placeholder="AIzaSy..." />
+
+                            <label for="settings-key-openai" class="form-label">OpenAI API Key</label>
+                            <input id="settings-key-openai" class="form-input" type="password" placeholder="sk-..." />
+
+                            <label for="settings-key-anthropic" class="form-label">Anthropic API Key</label>
+                            <input id="settings-key-anthropic" class="form-input" type="password" placeholder="sk-ant-..." />
+
+                            <label for="settings-key-openrouter" class="form-label">OpenRouter API Key</label>
+                            <input id="settings-key-openrouter" class="form-input" type="password" placeholder="sk-or-..." />
+
+                            <label for="settings-key-nous" class="form-label">Nous Portal API Key</label>
+                            <input id="settings-key-nous" class="form-input" type="password" placeholder="nous-..." />
+
+                            <label for="settings-ollama-endpoint" class="form-label">Ollama Endpoint</label>
+                            <input id="settings-ollama-endpoint" class="form-input" type="text" value="http://localhost:11434" />
+
+                            <button type="button" id="btn-test-llm-settings" class="btn-secondary btn-block">Test Active LLM Connection</button>
+                            <div id="settings-llm-test-result" class="setup-test-banner hidden"></div>
+                        </div>
+
+                        <div class="sidebar-card">
+                            <div class="card-header">
+                                <h4>Governance &amp; Autonomy</h4>
+                            </div>
+                            <label for="settings-autonomy-tier" class="form-label">Default Autonomy Tier</label>
+                            <select id="settings-autonomy-tier" class="form-select">
+                                <option value="Guarded">Guarded</option>
+                                <option value="FullAutonomy">Full Autonomy</option>
+                                <option value="Conservative">Conservative</option>
+                            </select>
+
+                            <div class="form-checkbox">
+                                <input id="settings-require-red" type="checkbox" checked />
+                                <label for="settings-require-red">Require Interactive Approval for Red-Tier Actions</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-save-settings" class="btn-primary btn-block">Save Configuration</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Resizable Splitter 1: Between Sidebar and Main Workspace -->
+        <div class="resize-handle" id="sidebar-splitter" title="Drag to resize sidebar"></div>
+
+        <!-- Adaptive Main Workspace -->
+        <main class="main-workspace" id="main-workspace">
+            <!-- Workspace Mode Navigation Tabs -->
+            <div class="workspace-tabs" id="workspace-tabs">
+                <button class="ws-tab-btn active" data-tab="chat">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>Chat Stream</span>
+                </button>
+                <button class="ws-tab-btn" data-tab="editor">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                    <span>Code Editor</span>
+                </button>
+                <button class="ws-tab-btn" data-tab="terminal">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    <span>Terminal</span>
+                </button>
+                <button class="ws-tab-btn" data-tab="diff">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="18" r="3"></circle>
+                        <circle cx="6" cy="6" r="3"></circle>
+                        <path d="M6 9a9 9 0 0 0 9 9"></path>
+                    </svg>
+                    <span>Diff &amp; Changes</span>
+                </button>
+                <button class="ws-tab-btn" data-tab="workflow">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                    <span>Live Workflow</span>
+                </button>
+            </div>
+
+            <!-- Tab 1: Chat Stream View -->
+            <div class="workspace-tab-content active" id="tab-chat">
+                <!-- Ghost Typing Live Stream Banner -->
+                <div id="ghost-typing-banner" class="ghost-banner hidden">
+                    <div class="ghost-pulse"></div>
+                    <span class="ghost-label">Remote Ghost Typing:</span>
+                    <span id="ghost-preview-text" class="ghost-text"></span>
+                </div>
+
+                <!-- Chat Stream Messages Container -->
+                <div id="chat-stream-container" class="chat-stream">
+                    <div class="chat-welcome-card">
+                        <h2>HUMofA Production Workspace</h2>
+                        <p>Autonomous AI Agent platform with streaming execution, tool visualization, and safety governance.</p>
+                        <div class="welcome-shortcuts">
+                            <span><kbd>Ctrl+K</kbd> Command Palette</span>
+                            <span><kbd>F12</kbd> Panic Stop</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Controls -->
+                <div class="chat-input-bar">
+                    <form id="form-chat" class="chat-input-form">
+                        <textarea id="chat-prompt-input" class="chat-textarea" rows="2" placeholder="Send prompt to agent or dispatch autonomous tools (Enter to send, Shift+Enter for new line)..."></textarea>
+                        <div class="chat-actions">
+                            <select id="chat-model-selector" class="form-select-sm">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                                <option value="claude-3-7-sonnet">Claude 3.7 Sonnet</option>
+                                <option value="gpt-4o">GPT-4o</option>
+                            </select>
+                            <button type="submit" id="btn-send-chat" class="btn-primary">
+                                <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                                <span>Send</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab 2: Code Editor View -->
+            <div class="workspace-tab-content" id="tab-editor">
+                <div class="editor-toolbar">
+                    <div class="editor-file-info">
+                        <span id="editor-active-file" class="editor-filename">No file selected</span>
+                        <span id="editor-dirty-badge" class="pill pill-yellow hidden">Modified</span>
+                    </div>
+                    <div class="editor-actions">
+                        <input id="editor-path-input" class="form-input-sm" type="text" placeholder="relative/path/to/file.ext" />
+                        <button id="btn-editor-load" class="btn-sm btn-secondary">Open</button>
+                        <button id="btn-editor-save" class="btn-sm btn-primary">Save (Ctrl+S)</button>
+                    </div>
+                </div>
+                <div class="code-editor-container">
+                    <div class="line-numbers" id="editor-line-numbers">1</div>
+                    <textarea id="code-editor-textarea" class="code-textarea" spellcheck="false" placeholder="Select or open a file from the file explorer..."></textarea>
+                </div>
+            </div>
+
+            <!-- Tab 3: Terminal Console View -->
+            <div class="workspace-tab-content" id="tab-terminal">
+                <div class="terminal-toolbar">
+                    <div class="terminal-backend-selector">
+                        <label for="terminal-backend-select" class="sr-only">Execution Backend</label>
+                        <select id="terminal-backend-select" class="form-select-sm">
+                            <option value="Local">Local Windows</option>
+                            <option value="Docker">Docker Container</option>
+                            <option value="Ssh">SSH Remote</option>
+                            <option value="Singularity">Singularity</option>
+                            <option value="Modal">Modal Serverless</option>
+                        </select>
+                    </div>
+                    <div class="terminal-actions">
+                        <button id="btn-terminal-clear" class="btn-sm btn-secondary">Clear Console</button>
+                    </div>
+                </div>
+                <div id="terminal-console-output" class="terminal-console" tabindex="0">
+                    <div class="term-line term-system">HUMofA Terminal Console connected to execution subsystem. Type command below.</div>
+                </div>
+                <div class="terminal-input-bar">
+                    <form id="form-terminal" class="terminal-form">
+                        <span class="term-prompt-symbol">&gt;</span>
+                        <input id="terminal-cmd-input" class="term-input" type="text" placeholder="Type shell command and press Enter (e.g. dotnet test)..." autocomplete="off" />
+                        <button type="submit" id="btn-terminal-run" class="btn-primary btn-sm">Run</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab 4: Diff Viewer View -->
+            <div class="workspace-tab-content" id="tab-diff">
+                <div class="diff-toolbar">
+                    <div class="diff-file-meta">
+                        <span id="diff-file-title" class="diff-title">Unified File Diff</span>
+                        <span class="diff-counter add" id="diff-add-badge">+0</span>
+                        <span class="diff-counter del" id="diff-del-badge">-0</span>
+                    </div>
+                    <div class="diff-controls">
+                        <input id="diff-path-input" class="form-input-sm" type="text" placeholder="File path to diff..." />
+                        <button id="btn-diff-load" class="btn-sm btn-secondary">Compute Diff</button>
+                        <button id="btn-diff-approve" class="btn-sm btn-success">
+                            <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Approve &amp; Apply</span>
+                        </button>
+                        <button id="btn-diff-reject" class="btn-sm btn-danger">
+                            <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            <span>Reject</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="diff-proposed-editor-drawer" id="diff-drawer">
+                    <label for="diff-proposed-textarea" class="form-label">Proposed New Content</label>
+                    <textarea id="diff-proposed-textarea" class="form-textarea" rows="4" placeholder="Paste or type proposed changes to preview unified diff..."></textarea>
+                </div>
+                <div id="diff-viewer-container" class="diff-container">
+                    <div class="empty-placeholder">No active diff loaded. Select a modified file or compute a diff above.</div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Live Workflow Graph View -->
+            <div class="workspace-tab-content" id="tab-workflow">
+                <div class="workflow-header">
+                    <div class="workflow-title-block">
+                        <h3 id="workflow-task-title">No Task Active</h3>
+                        <span id="workflow-status-pill" class="pill pill-grey">Idle</span>
+                    </div>
+                    <div class="workflow-progress-wrapper">
+                        <div class="progress-bar-track">
+                            <div id="workflow-progress-fill" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                        <span id="workflow-progress-percent" class="progress-percent">0%</span>
+                    </div>
+                </div>
+
+                <!-- 5-Phase DAG Pipeline Visualization -->
+                <div class="workflow-dag" id="workflow-dag">
+                    <div class="dag-step pending" id="dag-step-0">
+                        <div class="dag-step-icon">1</div>
+                        <div class="dag-step-name">Understand &amp; Plan</div>
+                        <div class="dag-step-status">Pending</div>
+                    </div>
+                    <div class="dag-connector"></div>
+                    <div class="dag-step pending" id="dag-step-1">
+                        <div class="dag-step-icon">2</div>
+                        <div class="dag-step-name">Context Retrieval</div>
+                        <div class="dag-step-status">Pending</div>
+                    </div>
+                    <div class="dag-connector"></div>
+                    <div class="dag-step pending" id="dag-step-2">
+                        <div class="dag-step-icon">3</div>
+                        <div class="dag-step-name">Action Execution</div>
+                        <div class="dag-step-status">Pending</div>
+                    </div>
+                    <div class="dag-connector"></div>
+                    <div class="dag-step pending" id="dag-step-3">
+                        <div class="dag-step-icon">4</div>
+                        <div class="dag-step-name">Verification</div>
+                        <div class="dag-step-status">Pending</div>
+                    </div>
+                    <div class="dag-connector"></div>
+                    <div class="dag-step pending" id="dag-step-4">
+                        <div class="dag-step-icon">5</div>
+                        <div class="dag-step-name">Review &amp; Report</div>
+                        <div class="dag-step-status">Pending</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>Live Execution Steps</h4>
+                    </div>
+                    <div id="workflow-steps-log" class="list-stack">
+                        <div class="empty-placeholder">Launch a task to see live step progress</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Resizable Splitter 2: Between Main Workspace and Right Telemetry Panel -->
+        <div class="resize-handle" id="right-panel-splitter" title="Drag to resize telemetry panel"></div>
+
+        <!-- Contextual Right Panel with 8 Telemetry Modules -->
+        <aside class="right-panel" id="right-panel">
+            <div class="panel-header">
+                <h3>Telemetry &amp; Context</h3>
+                <button id="btn-toggle-right-panel" class="btn-icon-sm" title="Toggle Right Panel">
+                    <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="panel-modules" id="panel-modules">
+                <!-- Module 1: Task Details & Metadata -->
+                <section class="telemetry-card" id="module-task-details">
+                    <div class="module-title">1. Task Details</div>
+                    <div class="meta-grid">
+                        <span class="meta-key">ID:</span>
+                        <span class="meta-val" id="meta-task-id">—</span>
+                        <span class="meta-key">Model:</span>
+                        <span class="meta-val" id="meta-task-model">—</span>
+                        <span class="meta-key">Autonomy:</span>
+                        <span class="meta-val" id="meta-task-autonomy">Guarded</span>
+                        <span class="meta-key">Status:</span>
+                        <span class="meta-val" id="meta-task-status">Idle</span>
+                    </div>
+                </section>
+
+                <!-- Module 2: Agent Status & Health -->
+                <section class="telemetry-card" id="module-agent-status">
+                    <div class="module-title">2. Agent Status &amp; Health</div>
+                    <div class="health-status-row">
+                        <span class="status-indicator-dot online" id="agent-health-dot"></span>
+                        <span id="agent-health-label" class="health-label">System Active</span>
+                    </div>
+                    <div class="meta-grid">
+                        <span class="meta-key">Active Agent:</span>
+                        <span class="meta-val" id="meta-active-agent">HUMofA Primary</span>
+                        <span class="meta-key">COM Provider:</span>
+                        <span class="meta-val">IUIAutomation</span>
+                    </div>
+                </section>
+
+                <!-- Module 3: Active Tools & Permissions -->
+                <section class="telemetry-card" id="module-active-tools">
+                    <div class="module-title">3. Active Tools &amp; Permissions</div>
+                    <div class="tools-toggle-grid" id="tools-toggle-grid">
+                        <label class="tool-toggle-item">
+                            <input type="checkbox" id="tool-perm-terminal" checked />
+                            <span>Terminal</span>
+                        </label>
+                        <label class="tool-toggle-item">
+                            <input type="checkbox" id="tool-perm-filesystem" checked />
+                            <span>FileSystem</span>
+                        </label>
+                        <label class="tool-toggle-item">
+                            <input type="checkbox" id="tool-perm-web" checked />
+                            <span>Web Search</span>
+                        </label>
+                        <label class="tool-toggle-item">
+                            <input type="checkbox" id="tool-perm-cdp" checked />
+                            <span>Browser CDP</span>
+                        </label>
+                        <label class="tool-toggle-item">
+                            <input type="checkbox" id="tool-perm-git" checked />
+                            <span>Git Ops</span>
+                        </label>
+                        <label class="tool-toggle-item">
+                            <input type="checkbox" id="tool-perm-subagents" checked />
+                            <span>SubAgents</span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Module 4: Modified Files List -->
+                <section class="telemetry-card" id="module-modified-files">
+                    <div class="module-title">4. Modified Files List</div>
+                    <div id="modified-files-list" class="files-ledger-list">
+                        <div class="empty-placeholder">No modified files</div>
+                    </div>
+                </section>
+
+                <!-- Module 5: Execution Plan Checklist -->
+                <section class="telemetry-card" id="module-execution-plan">
+                    <div class="module-title">5. Execution Plan Checklist</div>
+                    <div id="execution-plan-checklist" class="plan-checklist">
+                        <div class="empty-placeholder">No active execution plan</div>
+                    </div>
+                </section>
+
+                <!-- Module 6: Subagent Activity Stream -->
+                <section class="telemetry-card" id="module-subagent-stream">
+                    <div class="module-title">6. Subagent Activity Stream</div>
+                    <div id="subagent-stream-list" class="activity-stream-list">
+                        <div class="empty-placeholder">No subagents active</div>
+                    </div>
+                </section>
+
+                <!-- Module 7: Token Usage Telemetry -->
+                <section class="telemetry-card" id="module-token-telemetry">
+                    <div class="module-title">7. Token Usage Telemetry</div>
+                    <div class="telemetry-stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-number" id="telemetry-prompt-tokens">0</div>
+                            <div class="stat-label">Prompt Tokens</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" id="telemetry-completion-tokens">0</div>
+                            <div class="stat-label">Completion Tokens</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" id="telemetry-total-tokens">0</div>
+                            <div class="stat-label">Total Tokens</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" id="telemetry-estimated-cost">$0.000</div>
+                            <div class="stat-label">Estimated Cost</div>
+                        </div>
+                    </div>
+                    <div class="gauge-wrapper">
+                        <div class="gauge-label">
+                            <span>Context Window Gauge</span>
+                            <span id="telemetry-gauge-percent">0.0%</span>
+                        </div>
+                        <div class="progress-bar-track">
+                            <div id="telemetry-gauge-fill" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Module 8: Runtime Logs -->
+                <section class="telemetry-card" id="module-runtime-logs">
+                    <div class="module-title">
+                        <span>8. Runtime Logs</span>
+                        <div class="log-filter-pills">
+                            <button class="pill-btn active" data-log-filter="all">All</button>
+                            <button class="pill-btn" data-log-filter="info">Info</button>
+                            <button class="pill-btn" data-log-filter="warn">Warn</button>
+                            <button class="pill-btn" data-log-filter="error">Error</button>
+                        </div>
+                    </div>
+                    <div id="runtime-logs-stream" class="logs-stream-container">
+                        <div class="log-line log-info">[Engine] Subsystem ready and operational</div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Raycast-Style Global Command Palette Modal -->
+    <div class="modal-backdrop hidden" id="palette-modal-backdrop">
+        <div class="command-palette-card" id="command-palette-card" role="dialog" aria-modal="true" aria-label="Command Palette">
+            <div class="palette-input-wrapper">
+                <svg class="icon search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input id="palette-search-input" class="palette-input" type="text" placeholder="Type a command, session, file, or action..." autocomplete="off" />
+                <kbd class="kbd-badge">ESC to close</kbd>
+            </div>
+            <div id="palette-results-list" class="palette-results">
+                <!-- Dynamically populated fuzzy results -->
+            </div>
+            <div class="palette-footer">
+                <span><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span><kbd>Enter</kbd> to select</span>
+                <span><kbd>Esc</kbd> to dismiss</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SmartApproval Modal / Prompt -->
+    <div class="modal-backdrop hidden" id="smart-approval-modal">
+        <div class="approval-card" id="approval-card" role="dialog" aria-modal="true" aria-label="Smart Approval Prompt">
+            <div class="approval-header">
+                <div class="approval-icon-shield" id="approval-shield-icon">
+                    <svg class="icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="approval-title">Smart Approval Required</h3>
+                    <span id="approval-tier-badge" class="pill pill-yellow">Yellow Tier</span>
+                </div>
+            </div>
+
+            <!-- Yellow Tier Grace Period Countdown Banner -->
+            <div id="approval-yellow-banner" class="approval-timer-banner">
+                <span>Auto-executing in <strong id="approval-timer-seconds">5.0</strong>s (Grace Period)</span>
+                <div class="progress-bar-track">
+                    <div id="approval-timer-fill" class="progress-bar-fill timer-yellow" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Red Tier Countdown Banner -->
+            <div id="approval-red-banner" class="approval-timer-banner hidden">
+                <span>Interactive Approval Timeout: <strong id="approval-red-seconds">120</strong>s</span>
+                <div class="progress-bar-track">
+                    <div id="approval-red-fill" class="progress-bar-fill timer-red" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="approval-body">
+                <div class="meta-grid">
+                    <span class="meta-key">Action:</span>
+                    <span class="meta-val" id="approval-action-name">terminal_exec</span>
+                    <span class="meta-key">Description:</span>
+                    <span class="meta-val" id="approval-description">Executing shell command</span>
+                </div>
+            </div>
+
+            <div class="approval-actions">
+                <button id="btn-approval-cancel" class="btn-secondary">Cancel Grace Period</button>
+                <button id="btn-approval-reject" class="btn-danger">Deny Action</button>
+                <button id="btn-approval-accept" class="btn-success">Approve &amp; Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- First-Run & Dynamic Reconfiguration Setup Wizard Modal -->
+    <div class="modal-backdrop hidden" id="setup-wizard-modal">
+        <div class="setup-wizard-card" id="setup-wizard-card" role="dialog" aria-modal="true" aria-label="LLM &amp; Workspace Setup Wizard">
+            <div class="setup-wizard-header">
+                <div>
+                    <h2 id="setup-wizard-title">HUMofA Setup &amp; Live LLM Configuration</h2>
+                    <p class="setup-wizard-subtitle">Connect a real AI model provider (or local Ollama) for both Desktop and CLI. You can change any of these settings at any time.</p>
+                </div>
+                <button type="button" id="btn-setup-close" class="btn-icon-sm" title="Close Setup Wizard">✕</button>
+            </div>
+
+            <form id="form-setup-wizard" class="setup-wizard-body">
+                <!-- Step 1: Provider Selection -->
+                <div class="setup-section">
+                    <div class="setup-section-title">1. Choose Primary AI Provider</div>
+                    <div class="setup-provider-grid" id="setup-provider-grid">
+                        <button type="button" class="setup-provider-card active" data-provider="gemini" data-default-model="gemini-2.5-flash">
+                            <span class="provider-name">Google Gemini</span>
+                            <span class="provider-desc">Gemini 2.5 Flash / Pro</span>
+                        </button>
+                        <button type="button" class="setup-provider-card" data-provider="openai" data-default-model="gpt-4o">
+                            <span class="provider-name">OpenAI</span>
+                            <span class="provider-desc">GPT-4o / o3-mini</span>
+                        </button>
+                        <button type="button" class="setup-provider-card" data-provider="anthropic" data-default-model="claude-3-7-sonnet-latest">
+                            <span class="provider-name">Anthropic</span>
+                            <span class="provider-desc">Claude 3.7 Sonnet</span>
+                        </button>
+                        <button type="button" class="setup-provider-card" data-provider="openrouter" data-default-model="openrouter/auto">
+                            <span class="provider-name">OpenRouter</span>
+                            <span class="provider-desc">200+ Models Unified</span>
+                        </button>
+                        <button type="button" class="setup-provider-card" data-provider="nous" data-default-model="nous/hermes-3-llama-3.1-405b">
+                            <span class="provider-name">Nous Portal</span>
+                            <span class="provider-desc">Hermes 3 405B</span>
+                        </button>
+                        <button type="button" class="setup-provider-card" data-provider="ollama" data-default-model="ollama/qwen2.5-coder:latest">
+                            <span class="provider-name">Local Ollama</span>
+                            <span class="provider-desc">100% Local &amp; Private</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Credentials & Live Verification -->
+                <div class="setup-section">
+                    <div class="setup-section-title">2. API Key / Endpoint &amp; Live Connection Test</div>
+                    <div id="setup-apikey-group">
+                        <label for="setup-api-key-input" class="form-label" id="setup-api-key-label">API Key</label>
+                        <input id="setup-api-key-input" class="form-input" type="password" placeholder="Paste your API key here..." autocomplete="off" />
+                    </div>
+                    <div id="setup-ollama-group" class="hidden">
+                        <label for="setup-ollama-endpoint-input" class="form-label">Local Ollama Endpoint URL</label>
+                        <input id="setup-ollama-endpoint-input" class="form-input" type="text" value="http://127.0.0.1:11434" />
+                    </div>
+                    <div class="setup-test-row">
+                        <button type="button" id="btn-setup-test-connection" class="btn-secondary">⚡ Test Live LLM Connection</button>
+                        <div id="setup-test-result" class="setup-test-banner hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Model & Workspace Defaults -->
+                <div class="setup-section">
+                    <div class="setup-section-title">3. Model, Autonomy &amp; Appearance</div>
+                    <div class="setup-two-col">
+                        <div>
+                            <label for="setup-default-model" class="form-label">Default Model ID</label>
+                            <input id="setup-default-model" class="form-input" type="text" value="gemini-2.5-flash" required />
+                        </div>
+                        <div>
+                            <label for="setup-autonomy-tier" class="form-label">Default Autonomy Tier</label>
+                            <select id="setup-autonomy-tier" class="form-select">
+                                <option value="Guarded">Guarded (Recommended)</option>
+                                <option value="Conservative">Conservative (Ask More)</option>
+                                <option value="FullAutonomy">Full Autonomy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setup-two-col">
+                        <div>
+                            <label for="setup-working-dir" class="form-label">Default Working Directory</label>
+                            <input id="setup-working-dir" class="form-input" type="text" placeholder="Leave blank for current workspace" />
+                        </div>
+                        <div>
+                            <label for="setup-theme" class="form-label">Workspace Theme</label>
+                            <select id="setup-theme" class="form-select">
+                                <option value="dark">Dark (Linear/Developer)</option>
+                                <option value="light">Light</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setup-wizard-footer">
+                    <button type="button" id="btn-setup-skip" class="btn-secondary">Skip for Now (Offline Fallback)</button>
+                    <button type="submit" id="btn-setup-complete" class="btn-primary">Save &amp; Activate Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Core Script -->
+    <script src="/app.js"></script>
+</body>
+</html>
